@@ -1,5 +1,7 @@
 package cn.yong.springframework.factory.conifg;
 
+import cn.yong.springframework.PropertyValues;
+
 /**
  * @Desc Bean定义
  * @author Allen
@@ -12,8 +14,18 @@ public class BeanDefinition {
      */
     private Class beanClass;
 
+    /**
+     * 属性值列表
+     */
+    private PropertyValues propertyValues;
+
     public BeanDefinition(Class beanClass) {
+        this(beanClass, new PropertyValues());
+    }
+
+    public BeanDefinition(Class beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
+        this.propertyValues = propertyValues;
     }
 
     public Class getBeanClass() {
@@ -22,5 +34,13 @@ public class BeanDefinition {
 
     public void setBeanClass(Class beanClass) {
         this.beanClass = beanClass;
+    }
+
+    public PropertyValues getPropertyValues() {
+        return propertyValues;
+    }
+
+    public void setPropertyValues(PropertyValues propertyValues) {
+        this.propertyValues = propertyValues;
     }
 }
