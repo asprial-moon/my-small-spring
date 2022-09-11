@@ -1,10 +1,13 @@
 package cn.yong.springframework.test.bean;
 
+import cn.yong.springframework.beans.factory.DisposableBean;
+import cn.yong.springframework.beans.factory.InitializingBean;
+
 /**
  * @author Allen
  * @date 2022/9/9
  */
-public class UserService {
+public class UserService implements InitializingBean, DisposableBean {
 
 
     private String uId;
@@ -48,4 +51,13 @@ public class UserService {
         this.userDao = userDao;
     }
 
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("执行：UserService.destroy");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("执行：UserService.afterPropertiesSet");
+    }
 }
