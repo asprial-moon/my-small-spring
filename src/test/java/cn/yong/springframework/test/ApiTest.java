@@ -4,31 +4,45 @@ package cn.yong.springframework.test;
 import cn.yong.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.yong.springframework.test.bean.UserService;
 import org.junit.Test;
+import org.openjdk.jol.info.ClassLayout;
 
 /**
  * @author Allen
  * @date 2022/9/9
  */
 public class ApiTest {
+
     @Test
-    public void test_xml() {
+    public void test_prototype() {
         // 1.初始化 BeanFactory
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
         applicationContext.registerShutdownHook();
 
         // 2. 获取Bean对象调用方法
-        UserService userService = applicationContext.getBean("userService", UserService.class);
-        String result = userService.queryUserInfo();
-        System.out.println("测试结果：" + result);
+        UserService userService01 = applicationContext.getBean("userService", UserService.class);
+        UserService userService02 = applicationContext.getBean("userService", UserService.class);
 
-        System.out.println("ApplicationContextAware："+userService.getApplicationContext());
-        System.out.println("BeanFactoryAware："+userService.getBeanFactory());
+        // 3. 配置 scope="prototype/singleton"
+        System.out.println(userService01);
+        System.out.println(userService02);
 
+        // 4. 打印十六进制哈希
+        System.out.println(userService01 + " 十六进制哈希：" + Integer.toHexString(userService01.hashCode()));
+        System.out.println(ClassLayout.parseInstance(userService01).toPrintable());
     }
 
     @Test
-    public void test_hook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> System.out.println("close！")));
-    }
+    public void test_factory_bean() {
+        // 1.初始化 BeanFactory
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+        // 2. 调用代理方法
+        UserService userService1 = applicationContext.getBean("userService", UserService.class);
+        System.out.println("测试结果：" + userService1.queryUserInfo());
+        // 2. 调用代理方法
+        UserService userService2 = applicationContext.getBean("userService", UserService.class);
+        System.out.println("测试结果：" + userService2.queryUserInfo());
 
+        System.out.println(userService1 == userService2);
+    }
 }
