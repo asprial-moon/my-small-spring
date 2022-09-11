@@ -4,9 +4,16 @@ import cn.yong.springframework.beans.BeansException;
 import cn.yong.springframework.beans.factory.ConfigurableListableBeanFactory;
 import cn.yong.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import cn.yong.springframework.beans.factory.config.BeanPostProcessor;
+import cn.yong.springframework.context.ApplicationEvent;
+import cn.yong.springframework.context.ApplicationListener;
 import cn.yong.springframework.context.ConfigurableApplicationContext;
+import cn.yong.springframework.context.event.ApplicationEventMulticaster;
+import cn.yong.springframework.context.event.ContextClosedEvent;
+import cn.yong.springframework.context.event.ContextRefreshedEvent;
+import cn.yong.springframework.context.event.SimpleApplicationEventMulticaster;
 import cn.yong.springframework.core.io.DefaultResourceLoader;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -19,6 +26,8 @@ import java.util.Map;
  * <p> 通过扩展DefaultResourceLoader实现资源加载。因此，将非 URL 资源路径视为类路径资源（支持包含包路径的完整类路径资源名称，例如“mypackage/myresource.dat”），除非在子类中覆盖getResourceByPath方法
  */
 public abstract class AbstractApplicationContext extends DefaultResourceLoader implements ConfigurableApplicationContext {
+    public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Override
     public void refresh() throws BeansException {
@@ -37,8 +46,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         // 5.BeanPostProcessor 需要提前于其他 Bean 对象实例化之前执行注册操作
         registerBeanPostProcessors(beanFactory);
 
-        // 6.提前实例化单例Bean对象
+        // 6.初始化事件发布者
+        initApplicationEventMulticaster();
+
+        // 7.注册事件监听器
+        registerListeners();
+
+        // 8.提前实例化单例Bean对象
         beanFactory.preInstantiateSingletons();
+
+        // 9.发布容器刷新完成事件
+        finishRefresh();
     }
 
     /**
@@ -69,6 +87,29 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         for (BeanPostProcessor beanPostProcessor : beanPostProcessorMap.values()) {
             beanFactory.addBeanPostProcessor(beanPostProcessor);
         }
+    }
+
+
+    private void initApplicationEventMulticaster() {
+        ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+        applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
+        beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, applicationEventMulticaster);
+    }
+
+    private void registerListeners() {
+        Collection<ApplicationListener> applicationListeners = getBeansOfType(ApplicationListener.class).values();
+        for (ApplicationListener listener : applicationListeners) {
+            applicationEventMulticaster.addApplicationListener(listener);
+        }
+    }
+
+    private void finishRefresh() {
+        publishEvent(new ContextRefreshedEvent(this));
+    }
+
+    @Override
+    public void publishEvent(ApplicationEvent event) {
+        applicationEventMulticaster.multicastEvent(event);
     }
 
     @Override
@@ -103,6 +144,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     @Override
     public void close() {
+        // 发布容器关闭事件
+        publishEvent(new ContextClosedEvent(this));
+
+        // 执行销毁单例bean的销毁事件
         getBeanFactory().destroySingletons();
     }
 }

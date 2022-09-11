@@ -1,6 +1,8 @@
 package cn.yong.springframework.context;
 
+import cn.yong.springframework.beans.factory.HierarchicalBeanFactory;
 import cn.yong.springframework.beans.factory.ListableBeanFactory;
+import cn.yong.springframework.core.io.ResourceLoader;
 
 /**
  * @author Line
@@ -16,5 +18,5 @@ import cn.yong.springframework.beans.factory.ListableBeanFactory;
  * <p>除了标准的org.springframework.beans.factory.BeanFactory生命周期功能之外，ApplicationContext 实现检测和调用ApplicationContextAware bean 以及ResourceLoaderAware 、 ApplicationEventPublisherAware和MessageSourceAware bean。
  * @date 2022/9/11
  */
-public interface ApplicationContext extends ListableBeanFactory {
+public interface ApplicationContext extends ListableBeanFactory, HierarchicalBeanFactory, ResourceLoader, ApplicationEventPublisher {
 }
