@@ -2,7 +2,7 @@ package cn.yong.springframework.beans.factory.support;
 
 import cn.yong.springframework.beans.BeansException;
 import cn.yong.springframework.beans.factory.ConfigurableListableBeanFactory;
-import cn.yong.springframework.beans.factory.conifg.BeanDefinition;
+import cn.yong.springframework.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
     @Override
     public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException {
-        return null;
+        Map<String, T> result = new HashMap<>();
+        beanDefinitionMap.forEach((beanName, beanDefinition) -> {
+            Class beanClass = beanDefinition.getBeanClass();
+            if (type.isAssignableFrom(beanClass)) {
+                result.put(beanName, (T) getBean(beanName));
+            }
+        });
+        return result;
     }
 
     @Override
@@ -46,5 +53,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
             throw new BeansException("No bean named '" + beanName + "' is defined");
         }
         return beanDefinition;
+    }
+
+    @Override
+    public void preInstantiateSingletons() throws BeansException {
+        beanDefinitionMap.keySet().forEach(this::getBean);
     }
 }

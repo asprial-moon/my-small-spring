@@ -1,4 +1,4 @@
-package cn.yong.springframework.beans.factory.conifg;
+package cn.yong.springframework.beans.factory.config;
 
 import cn.yong.springframework.beans.factory.HierarchicalBeanFactory;
 
@@ -16,4 +16,9 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 
     String SCOPE_PROTOTYPE = "prototype";
 
+    /**
+     * 添加后置处理器
+     * @param beanPostProcessor
+     */
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }

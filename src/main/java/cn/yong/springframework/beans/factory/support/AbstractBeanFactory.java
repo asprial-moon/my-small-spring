@@ -1,15 +1,20 @@
 package cn.yong.springframework.beans.factory.support;
 
 import cn.yong.springframework.beans.BeansException;
-import cn.yong.springframework.beans.factory.BeanFactory;
-import cn.yong.springframework.beans.factory.conifg.BeanDefinition;
+import cn.yong.springframework.beans.factory.config.BeanDefinition;
+import cn.yong.springframework.beans.factory.config.BeanPostProcessor;
+import cn.yong.springframework.beans.factory.config.ConfigurableBeanFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 抽象类定义模板方法
  * @author Allen
  * @date 2022/9/9
  */
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -51,4 +56,18 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      * @throws BeansException Bean异常
      */
     protected abstract Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException;
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.remove(beanPostProcessor);
+        this.beanPostProcessors.add(beanPostProcessor);
+    }
+
+    /**
+     * Return the list of BeanPostProcessors that will get applied
+     * to beans created with this factory.
+     */
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return beanPostProcessors;
+    }
 }

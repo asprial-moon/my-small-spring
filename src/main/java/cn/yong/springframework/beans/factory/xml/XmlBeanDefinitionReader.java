@@ -4,8 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.XmlUtil;
 import cn.yong.springframework.beans.BeansException;
 import cn.yong.springframework.beans.PropertyValue;
-import cn.yong.springframework.beans.factory.conifg.BeanDefinition;
-import cn.yong.springframework.beans.factory.conifg.BeanReference;
+import cn.yong.springframework.beans.factory.config.BeanDefinition;
+import cn.yong.springframework.beans.factory.config.BeanReference;
 import cn.yong.springframework.beans.factory.support.AbstractBeanDefinitionReader;
 import cn.yong.springframework.beans.factory.support.BeanDefinitionRegistry;
 import cn.yong.springframework.core.io.Resource;
@@ -54,6 +54,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         ResourceLoader resourceLoader = getResourceLoader();
         Resource resource = resourceLoader.getResource(location);
         loadBeanDefinitions(resource);
+    }
+
+    @Override
+    public void loadBeanDefinitions(String... locations) throws BeansException {
+        for (String location : locations) {
+            loadBeanDefinitions(location);
+        }
     }
 
     protected void doLoadBeanDefinitions(InputStream inputStream) throws ClassNotFoundException {

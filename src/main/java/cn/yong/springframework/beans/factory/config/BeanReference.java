@@ -1,4 +1,4 @@
-package cn.yong.springframework.beans.factory.conifg;
+package cn.yong.springframework.beans.factory.config;
 
 /**
  * @author Line

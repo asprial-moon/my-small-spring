@@ -1,9 +1,10 @@
 package cn.yong.springframework.beans.factory;
 
 import cn.yong.springframework.beans.BeansException;
-import cn.yong.springframework.beans.factory.conifg.AutowireCapableBeanFactory;
-import cn.yong.springframework.beans.factory.conifg.BeanDefinition;
-import cn.yong.springframework.beans.factory.conifg.ConfigurableBeanFactory;
+import cn.yong.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import cn.yong.springframework.beans.factory.config.BeanDefinition;
+import cn.yong.springframework.beans.factory.config.BeanPostProcessor;
+import cn.yong.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 /**
  * @author Line
@@ -16,4 +17,15 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
 
     BeanDefinition getBeanDefinition(String beanName) throws BeansException;
 
+    /**
+     * 预实例化单例
+     * @throws BeansException
+     */
+    void preInstantiateSingletons() throws BeansException;
+
+    /**
+     * 添加 Bean 后处理器
+     * @param beanPostProcessor
+     */
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }

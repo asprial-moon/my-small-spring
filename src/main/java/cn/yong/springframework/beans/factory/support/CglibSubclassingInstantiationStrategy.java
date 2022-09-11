@@ -1,7 +1,7 @@
 package cn.yong.springframework.beans.factory.support;
 
 import cn.yong.springframework.beans.BeansException;
-import cn.yong.springframework.beans.factory.conifg.BeanDefinition;
+import cn.yong.springframework.beans.factory.config.BeanDefinition;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.NoOp;
 
