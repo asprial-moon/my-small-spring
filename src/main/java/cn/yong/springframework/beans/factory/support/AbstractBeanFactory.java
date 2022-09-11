@@ -4,6 +4,7 @@ import cn.yong.springframework.beans.BeansException;
 import cn.yong.springframework.beans.factory.config.BeanDefinition;
 import cn.yong.springframework.beans.factory.config.BeanPostProcessor;
 import cn.yong.springframework.beans.factory.config.ConfigurableBeanFactory;
+import cn.yong.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,10 @@ import java.util.List;
  * @date 2022/9/9
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+    /**
+     * 如有必要，使用 ClassLoader 解析 bean 类名
+     */
+    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     @Override
@@ -69,5 +74,9 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      */
     public List<BeanPostProcessor> getBeanPostProcessors() {
         return beanPostProcessors;
+    }
+
+    public ClassLoader getBeanClassLoader() {
+        return beanClassLoader;
     }
 }

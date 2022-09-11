@@ -21,10 +21,9 @@ public class ApiTest {
         String result = userService.queryUserInfo();
         System.out.println("测试结果：" + result);
 
-        // 2. 获取Bean对象调用方法
-        UserService userService1 = applicationContext.getBean("userService", UserService.class);
-        String result1 = userService1.queryUserInfo();
-        System.out.println("测试结果：" + result1 );
+        System.out.println("ApplicationContextAware："+userService.getApplicationContext());
+        System.out.println("BeanFactoryAware："+userService.getBeanFactory());
+
     }
 
     @Test
