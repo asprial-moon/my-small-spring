@@ -6,10 +6,7 @@ import cn.yong.springframework.beans.BeansException;
 import cn.yong.springframework.beans.PropertyValue;
 import cn.yong.springframework.beans.PropertyValues;
 import cn.yong.springframework.beans.factory.*;
-import cn.yong.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import cn.yong.springframework.beans.factory.config.BeanDefinition;
-import cn.yong.springframework.beans.factory.config.BeanPostProcessor;
-import cn.yong.springframework.beans.factory.config.BeanReference;
+import cn.yong.springframework.beans.factory.config.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -27,6 +24,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException {
         Object bean = null;
         try {
+            // 判断是否返回代理 Bean 对象
+            bean = resolveBeforeInstantiation(beanName, beanDefinition);
+            if (null != bean) {
+                return bean;
+            }
+            // 实例化 Bean
             bean = createBeanInstance(beanDefinition, beanName, args);
 
             // 给 Bean 填充属性
@@ -48,7 +51,37 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return bean;
     }
 
+    private Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (null != bean) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    /**
+     * 在实例化之前应用 Bean 后处理器
+     * @param beanClass
+     * @param beanName
+     * @return
+     */
+    private Object applyBeanPostProcessorsBeforeInstantiation(Class beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (null != result) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
     private void registerDisposableIfNecssary(String beanName, Object bean, BeanDefinition beanDefinition) {
+        // 非 Singleton 类型的 Bean 不执行销毁方法
+        if (!beanDefinition.isSingleton()) {
+            return;
+        }
         if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
             registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
         }

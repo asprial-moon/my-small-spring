@@ -1,5 +1,6 @@
 package cn.yong.springframework.aop.framework;
 
+import cn.yong.springframework.aop.AdvisedSupport;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.reflect.InvocationHandler;

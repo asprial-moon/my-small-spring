@@ -1,5 +1,6 @@
 package cn.yong.springframework.aop.framework;
 
+import cn.yong.springframework.aop.AdvisedSupport;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;

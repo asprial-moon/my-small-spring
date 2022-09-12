@@ -1,7 +1,5 @@
-package cn.yong.springframework.aop.framework;
+package cn.yong.springframework.aop;
 
-import cn.yong.springframework.aop.MethodMatcher;
-import cn.yong.springframework.aop.TargetSource;
 import org.aopalliance.intercept.MethodInterceptor;
 
 /**
@@ -12,6 +10,10 @@ import org.aopalliance.intercept.MethodInterceptor;
  * @date 2022/9/12
  */
 public class AdvisedSupport {
+    /**
+     * proxyConfig
+     */
+    private boolean proxyTargetClass = false;
     /**
      * 被代理的目标对象
      */
@@ -48,4 +50,13 @@ public class AdvisedSupport {
     public void setMethodMatcher(MethodMatcher methodMatcher) {
         this.methodMatcher = methodMatcher;
     }
+
+    public boolean isProxyTargetClass() {
+        return proxyTargetClass;
+    }
+
+    public void setProxyTargetClass(boolean proxyTargetClass) {
+        this.proxyTargetClass = proxyTargetClass;
+    }
+
 }
