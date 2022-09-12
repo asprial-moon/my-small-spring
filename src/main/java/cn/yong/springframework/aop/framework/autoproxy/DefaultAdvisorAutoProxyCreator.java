@@ -13,6 +13,9 @@ import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>BeanPostProcessor实现基于当前BeanFactory中的所有候选Advisor创建 AOP 代理。这个类是完全通用的；它不包含处理任何特定方面的特殊代码，例如池方面。
@@ -23,6 +26,7 @@ import java.util.Collection;
  */
 public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPostProcessor, BeanFactoryAware {
     private DefaultListableBeanFactory beanFactory;
+    private final Set<Object> earlyProxyReferences = Collections.synchronizedSet(new HashSet<>());
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -50,6 +54,13 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+       if (!earlyProxyReferences.contains(beanName)) {
+           return wrapIfNecessary(bean, beanName);
+       }
+       return bean;
+    }
+
+    protected Object wrapIfNecessary(Object bean, String beanName) {
         if (isInfrastructureClass(bean.getClass())) {
             return bean;
         }
@@ -66,11 +77,17 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
             advisedSupport.setTargetSource(targetSource);
             advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
             advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
-            advisedSupport.setProxyTargetClass(false);
+            advisedSupport.setProxyTargetClass(true);
 
             return new ProxyFactory(advisedSupport).getProxy();
         }
         return bean;
+    }
+
+    @Override
+    public Object getEarlyBeanReference(Object bean, String beanName) {
+        earlyProxyReferences.add(beanName);
+        return wrapIfNecessary(bean, beanName);
     }
 
     @Override
