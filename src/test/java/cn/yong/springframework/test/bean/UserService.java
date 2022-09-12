@@ -2,7 +2,6 @@ package cn.yong.springframework.test.bean;
 
 import cn.yong.springframework.beans.factory.annotation.Autowired;
 import cn.yong.springframework.beans.factory.annotation.Value;
-import cn.yong.springframework.stereotype.Component;
 
 import java.util.Random;
 
@@ -11,7 +10,7 @@ import java.util.Random;
  * 公众号：bugstack虫洞栈
  * Create by 小傅哥(fustack)
  */
-@Component("userService")
+//@Component("userService")
 public class UserService implements IUserService {
 
     @Value("${token}")

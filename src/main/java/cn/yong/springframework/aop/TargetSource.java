@@ -1,5 +1,7 @@
 package cn.yong.springframework.aop;
 
+import cn.yong.springframework.util.ClassUtils;
+
 /**
  * <p>targetSource用于获取 AOP 调用的当前“目标”，如果没有环绕通知选择结束拦截器链本身，则将通过反射调用该目标。
  * <p>如果TargetSource是“静态的”，它将始终返回相同的目标，从而允许在 AOP 框架中进行优化。动态目标源可以支持池化、热交换等。
@@ -19,7 +21,9 @@ public class TargetSource {
      * @return
      */
     public Class<?>[] getTargetClass() {
-        return this.target.getClass().getInterfaces();
+        Class<?> clazz = this.target.getClass();
+        clazz = ClassUtils.isCglibProxyClass(clazz) ? clazz.getSuperclass() : clazz;
+        return clazz.getInterfaces();
     }
 
     /**
